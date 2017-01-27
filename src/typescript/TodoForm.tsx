@@ -1,7 +1,6 @@
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
-import Todo from './Todo'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<TodoForm> {

@@ -95,6 +95,30 @@ var TodoForm = (function (_super) {
     return TodoForm;
 }(React.Component));
 
+var Filter;
+(function (Filter) {
+    Filter[Filter["all"] = 0] = "all";
+    Filter[Filter["active"] = 1] = "active";
+    Filter[Filter["completed"] = 2] = "completed";
+})(Filter || (Filter = {}));
+var list = [
+    ['All', Filter.all],
+    ['Active', Filter.active],
+    ['Completed', Filter.completed]
+];
+var liStyle = {
+    display: 'inline-block',
+    width: '80px',
+    textAlign: 'center'
+};
+var selectedStyle = __assign({}, liStyle, { background: '#eee' });
+var TodoFilter = function (props) {
+    return React.createElement("ul", null, list.map(function (_a) {
+        var text = _a[0], filter = _a[1];
+        return React.createElement("li", { style: filter === props.filter ? selectedStyle : liStyle, onClick: function (_) { props.setFilter(filter); } }, text);
+    }));
+};
+
 // import 'whatwg-fetch'
 var url = 'http://localhost:8080/api/1/todo/';
 var fetchOption = {
@@ -127,15 +151,17 @@ var TodoList = (function (_super) {
         var _this = _super.call(this) || this;
         _this.state = {
             todoDict: {},
-            todoDictIndex: []
+            todoDictIndex: [],
+            filter: Filter.all
         };
         _this.addTodo = function (todo) {
             addTodo(todo).then(function (todo) {
+                var _a = _this.state, todoDictIndex = _a.todoDictIndex, todoDict = _a.todoDict;
                 _this.setState({
-                    todoDictIndex: _this.state.todoDictIndex.concat([todo.id]),
-                    todoDict: __assign({}, _this.state.todoDict, (_a = {}, _a[todo.id] = todo, _a))
+                    todoDictIndex: _this.checkFilter(todo) ? todoDictIndex.concat([todo.id]) : todoDictIndex,
+                    todoDict: __assign({}, todoDict, (_b = {}, _b[todo.id] = todo, _b))
                 });
-                var _a;
+                var _b;
             });
         };
         _this.updateTodo = function (todo) {
@@ -153,6 +179,12 @@ var TodoList = (function (_super) {
                 todoDictIndex: _this.state.todoDictIndex.filter(function (v) { return v !== id; })
             });
         };
+        _this.setFilter = function (filter) {
+            var todoDictIndex = Object.keys(_this.state.todoDict).map(function (v) { return +v; }).filter(function (id) {
+                return _this.checkFilter(_this.state.todoDict[id], filter);
+            });
+            _this.setState({ filter: filter, todoDictIndex: todoDictIndex });
+        };
         readTodos().then(function (todos) {
             _this.setState({
                 todoDictIndex: todos.map(function (todo) { return todo.id; }),
@@ -161,6 +193,12 @@ var TodoList = (function (_super) {
         });
         return _this;
     }
+    TodoList.prototype.checkFilter = function (todo, filter) {
+        if (filter === void 0) { filter = this.state.filter; }
+        if (filter === Filter.all)
+            return true;
+        return todo.done === (filter === Filter.completed);
+    };
     TodoList.prototype.shouldComponentUpdate = function (nextProps, nextState) {
         return this.props !== nextProps || this.state !== nextState;
     };
@@ -171,6 +209,7 @@ var TodoList = (function (_super) {
         });
         return React.createElement("div", null,
             React.createElement(TodoForm, { addTodo: this.addTodo }),
+            React.createElement(TodoFilter, { filter: this.state.filter, setFilter: this.setFilter }),
             Todos);
     };
     return TodoList;

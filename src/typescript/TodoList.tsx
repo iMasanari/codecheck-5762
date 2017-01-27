@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom'
 
 import Todo from './Todo'
 import TodoForm from './TodoForm'
+import TodoFilter, { Filter } from './TodoFilter'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<TodoList> {
@@ -10,12 +11,14 @@ interface Props extends React.ClassAttributes<TodoList> {
 interface State {
     todoDict: { [key: number]: api.Todo }
     todoDictIndex: number[]
+    filter: Filter
 }
 
 export default class TodoList extends React.Component<Props, State> {
     state: State = {
         todoDict: {},
-        todoDictIndex: []
+        todoDictIndex: [],
+        filter: Filter.all
     }
 
     constructor() {
@@ -31,9 +34,11 @@ export default class TodoList extends React.Component<Props, State> {
 
     addTodo = (todo: Partial<api.Todo>) => {
         api.addTodo(todo).then(todo => {
+            const {todoDictIndex, todoDict} = this.state
+
             this.setState({
-                todoDictIndex: [...this.state.todoDictIndex, todo.id],
-                todoDict: { ...this.state.todoDict, [todo.id]: todo }
+                todoDictIndex: this.checkFilter(todo) ? [...todoDictIndex, todo.id] : todoDictIndex,
+                todoDict: { ...todoDict, [todo.id]: todo }
             })
         })
     }
@@ -54,6 +59,18 @@ export default class TodoList extends React.Component<Props, State> {
             todoDictIndex: this.state.todoDictIndex.filter(v => v !== id)
         })
     }
+    checkFilter(todo: api.Todo, filter = this.state.filter) {
+        if (filter === Filter.all) return true
+
+        return todo.done === (filter === Filter.completed)
+    }
+    setFilter = (filter: Filter) => {
+        const todoDictIndex = Object.keys(this.state.todoDict).map(v => +v).filter(id =>
+            this.checkFilter(this.state.todoDict[id], filter)
+        )
+
+        this.setState({ filter, todoDictIndex })
+    }
     shouldComponentUpdate(nextProps: Props, nextState: State) {
         return this.props !== nextProps || this.state !== nextState
     }
@@ -67,6 +84,7 @@ export default class TodoList extends React.Component<Props, State> {
 
         return <div>
             <TodoForm addTodo={this.addTodo} />
+            <TodoFilter filter={this.state.filter} setFilter={this.setFilter} />
             {Todos}
         </div>
     }
