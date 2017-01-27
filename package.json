@@ -1,0 +1,33 @@
+{
+  "name": "codecheck-5762",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "server": "java -jar server.jar",
+    "build": "rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iMasanari/codecheck-5762.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iMasanari/codecheck-5762/issues"
+  },
+  "homepage": "https://github.com/iMasanari/codecheck-5762#readme",
+  "devDependencies": {
+    "@types/react": "^15.0.4",
+    "@types/react-dom": "^0.14.21",
+    "@types/whatwg-fetch": "0.0.33",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "rollup": "^0.41.4",
+    "rollup-plugin-typescript": "^0.8.1",
+    "typescript": "^2.1.4",
+    "whatwg-fetch": "^2.0.2"
+  }
+}
