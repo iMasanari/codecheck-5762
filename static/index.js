@@ -19,10 +19,60 @@ function __extends(d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
+var EditableText = (function (_super) {
+    __extends(EditableText, _super);
+    function EditableText() {
+        var _this = _super.apply(this, arguments) || this;
+        _this.state = { editValue: null };
+        _this.editStart = function () {
+            var editValue = _this.props.defaultValue != null && _this.props.value === '' ?
+                _this.props.defaultValue : _this.props.value;
+            _this.setState({ editValue: editValue }, function () {
+                _this.refs.input.focus();
+                _this.refs.input.select();
+            });
+        };
+        _this.editEnd = function () {
+            var editValue = _this.state.editValue;
+            if (editValue != null && editValue !== _this.props.value) {
+                _this.props.update(editValue);
+            }
+            _this.setState({ editValue: null });
+        };
+        _this.onChange = function (e) {
+            _this.setState({ editValue: e.currentTarget.value });
+        };
+        _this.onKeyDown = function (e) {
+            switch (e.keyCode) {
+                case 13:
+                    _this.editEnd();
+                    break;
+                case 27:
+                    _this.setState({ editValue: null });
+                    break;
+            }
+        };
+        return _this;
+    }
+    EditableText.prototype.shouldComponentUpdate = function (nextProps, nextState) {
+        return this.props !== nextProps || this.state !== nextState;
+    };
+    EditableText.prototype.render = function () {
+        return React.createElement("label", null, this.state.editValue == null ?
+            React.createElement("span", { onDoubleClick: this.editStart }, this.props.children != null ? this.props.children : this.props.value)
+            :
+                React.createElement("input", { ref: "input", type: this.props.type, value: this.state.editValue, onChange: this.onChange, onBlur: this.editEnd, onKeyDown: this.onKeyDown }));
+    };
+    return EditableText;
+}(React.Component));
+
 var Todo = (function (_super) {
     __extends(Todo, _super);
     function Todo() {
         var _this = _super.apply(this, arguments) || this;
+        _this.state = {
+            editTitle: null
+        };
         _this.completedStyle = {
             textDecoration: 'line-through',
             color: 'gray'
@@ -35,6 +85,14 @@ var Todo = (function (_super) {
             var todo = _this.props.todo;
             _this.props.update(__assign({}, todo, { star: !todo.star }));
         };
+        _this.updateTitle = function (title) {
+            if (title === '')
+                return;
+            _this.props.update(__assign({}, _this.props.todo, { title: title }));
+        };
+        _this.updateTime_limit = function (time_limit) {
+            _this.props.update(__assign({}, _this.props.todo, { time_limit: time_limit }));
+        };
         _this.remove = function () {
             _this.props.remove(_this.props.todo.id);
         };
@@ -42,13 +100,10 @@ var Todo = (function (_super) {
     }
     Todo.prototype.Time = function (time_limit) {
         var _a = time_limit.split('-'), year = _a[0], month = _a[1], date = _a[2];
-        return React.createElement("span", null,
-            '（',
-            React.createElement("time", { dateTime: time_limit, title: time_limit },
-                month,
-                "/",
-                date),
-            '）');
+        return React.createElement("time", { dateTime: time_limit, title: time_limit },
+            month,
+            "/",
+            date);
     };
     Todo.prototype.shouldComponentUpdate = function (nextProps, nextState) {
         return this.props !== nextProps || this.state !== nextState;
@@ -59,8 +114,10 @@ var Todo = (function (_super) {
             React.createElement("div", null,
                 React.createElement("input", { type: "checkbox", checked: todo.done, onChange: this.toggleDone }),
                 React.createElement("span", { style: todo.done ? this.completedStyle : undefined },
-                    todo.title,
-                    todo.time_limit ? this.Time(todo.time_limit) : undefined),
+                    React.createElement(EditableText, { value: todo.title, update: this.updateTitle }),
+                    React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTime_limit },
+                        "\uD83D\uDDD3",
+                        todo.time_limit)),
                 React.createElement("span", { onClick: this.toggleStar }, todo.star ? '⭐️' : '☆'),
                 React.createElement("button", { onClick: this.remove }, "remove")));
     };
@@ -72,16 +129,23 @@ var TodoForm = (function (_super) {
     function TodoForm() {
         var _this = _super.apply(this, arguments) || this;
         _this.state = {
-            title: ''
+            title: '',
+            limit_time: null
         };
         _this.titleChangeHandler = function (e) {
-            _this.setState(__assign({}, _this.state, { title: e.currentTarget.value }));
+            _this.setState({ title: e.currentTarget.value });
         };
         _this.titleKeyDownHandler = function (e) {
             if (e.keyCode !== 13 || _this.state.title === '')
                 return;
             _this.props.addTodo({ "title": _this.state.title });
-            _this.setState({ title: '' });
+            _this.setState({
+                title: '',
+                limit_time: null
+            });
+        };
+        _this.updateLimit_time = function (limit_time) {
+            _this.setState({ limit_time: limit_time });
         };
         return _this;
     }
@@ -90,7 +154,10 @@ var TodoForm = (function (_super) {
     };
     TodoForm.prototype.render = function () {
         return React.createElement("div", null,
-            React.createElement("input", { type: "text", placeholder: "Add Todo...", value: this.state.title, onChange: this.titleChangeHandler, onKeyDown: this.titleKeyDownHandler }));
+            React.createElement("input", { type: "text", placeholder: "Add Todo...", value: this.state.title, onChange: this.titleChangeHandler, onKeyDown: this.titleKeyDownHandler }),
+            React.createElement(EditableText, { value: this.state.limit_time || '', update: this.updateLimit_time, defaultValue: '2017-01-01' },
+                "\uD83D\uDDD3",
+                this.state.limit_time));
     };
     return TodoForm;
 }(React.Component));

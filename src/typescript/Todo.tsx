@@ -2,6 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
 import TodoList from './TodoList'
+import EditableText from './EditableText'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<Todo> {
@@ -10,9 +11,17 @@ interface Props extends React.ClassAttributes<Todo> {
     remove: typeof TodoList.prototype.removeTodo
 }
 interface State {
+    editTitle: string | null
 }
 
 export default class Todo extends React.Component<Props, State> {
+    state: State = {
+        editTitle: null
+    }
+    refs: {
+        title: HTMLInputElement
+    }
+
     completedStyle = {
         textDecoration: 'line-through',
         color: 'gray'
@@ -25,17 +34,20 @@ export default class Todo extends React.Component<Props, State> {
         const {todo} = this.props
         this.props.update({ ...todo, star: !todo.star })
     }
+    updateTitle = (title: string) => {
+        if (title === '') return
+        this.props.update({ ...this.props.todo, title })
+    }
+    updateTime_limit = (time_limit: string) => {
+        this.props.update({ ...this.props.todo, time_limit })
+    }
     remove = () => {
         this.props.remove(this.props.todo.id)
     }
     Time(time_limit: string) {
         const [year, month, date] = time_limit.split('-')
 
-        return <span>
-            {'（'}
-            <time dateTime={time_limit} title={time_limit}>{month}/{date}</time>
-            {'）'}
-        </span>
+        return <time dateTime={time_limit} title={time_limit}>{month}/{date}</time>
     }
     shouldComponentUpdate(nextProps: Props, nextState: State) {
         return this.props !== nextProps || this.state !== nextState
@@ -50,8 +62,14 @@ export default class Todo extends React.Component<Props, State> {
                     onChange={this.toggleDone}
                     />
                 <span style={todo.done ? this.completedStyle : undefined}>
-                    {todo.title}
-                    {todo.time_limit ? this.Time(todo.time_limit) : undefined}
+                    <EditableText value={todo.title} update={this.updateTitle} />
+                    <EditableText type="date"
+                        value={todo.time_limit || ''}
+                        defaultValue={'2017-01-01'}
+                        update={this.updateTime_limit}
+                        >
+                        🗓{todo.time_limit}
+                    </EditableText>
                 </span>
                 <span onClick={this.toggleStar}>
                     {todo.star ? '⭐️' : '☆'}
