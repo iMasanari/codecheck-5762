@@ -66,6 +66,17 @@ var EditableText = (function (_super) {
     return EditableText;
 }(React.Component));
 
+var paddingZero = function (num) { return ('0' + num).slice(-2); };
+function checkDate(time_limit) {
+    var _a = time_limit.split('-'), year = _a[0], month = _a[1], date = _a[2];
+    if (year.length !== 4) {
+        return false;
+    }
+    var time = new Date(+year, +month - 1, +date);
+    var checkTime_limit = time.getFullYear() + "-" + paddingZero(time.getMonth() + 1) + "-" + paddingZero(time.getDate());
+    return time_limit === checkTime_limit;
+}
+
 var Todo = (function (_super) {
     __extends(Todo, _super);
     function Todo() {
@@ -90,7 +101,15 @@ var Todo = (function (_super) {
                 return;
             _this.props.update(__assign({}, _this.props.todo, { title: title }));
         };
-        _this.updateTime_limit = function (time_limit) {
+        _this.updateTimeLimit = function (time_limit) {
+            if (!time_limit) {
+                _this.props.update(__assign({}, _this.props.todo, { time_limit: null }));
+                return;
+            }
+            if (!checkDate(time_limit)) {
+                alert(time_limit + "\u306F\u7121\u52B9\u306A\u65E5\u4ED8\u3067\u3059\n" + (_this.props.todo.time_limit || '[未設定]') + "\u306B\u623B\u3057\u307E\u3057\u305F");
+                time_limit = _this.props.todo.time_limit;
+            }
             _this.props.update(__assign({}, _this.props.todo, { time_limit: time_limit }));
         };
         _this.remove = function () {
@@ -115,7 +134,7 @@ var Todo = (function (_super) {
                 React.createElement("input", { type: "checkbox", checked: todo.done, onChange: this.toggleDone }),
                 React.createElement("span", { style: todo.done ? this.completedStyle : undefined },
                     React.createElement(EditableText, { value: todo.title, update: this.updateTitle }),
-                    React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTime_limit },
+                    React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTimeLimit },
                         "\uD83D\uDDD3",
                         todo.time_limit)),
                 React.createElement("span", { onClick: this.toggleStar }, todo.star ? '⭐️' : '☆'),
@@ -145,6 +164,10 @@ var TodoForm = (function (_super) {
             });
         };
         _this.updateLimit_time = function (limit_time) {
+            if (limit_time != null && !checkDate(limit_time)) {
+                alert(limit_time + "\u306F\u7121\u52B9\u306A\u65E5\u4ED8\u3067\u3059\n" + (_this.state.limit_time || '[未設定]') + "\u306B\u623B\u3057\u307E\u3057\u305F");
+                limit_time = null;
+            }
             _this.setState({ limit_time: limit_time });
         };
         return _this;

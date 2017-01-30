@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom'
 
 import TodoList from './TodoList'
 import EditableText from './EditableText'
+import checkDate from './checkDate'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<Todo> {
@@ -38,7 +39,17 @@ export default class Todo extends React.Component<Props, State> {
         if (title === '') return
         this.props.update({ ...this.props.todo, title })
     }
-    updateTime_limit = (time_limit: string) => {
+    updateTimeLimit = (time_limit: string | null) => {
+        if (!time_limit) {
+            this.props.update({ ...this.props.todo, time_limit: null })
+            return
+        }
+        
+        if (!checkDate(time_limit)){
+            alert(`${time_limit}は無効な日付です\n${this.props.todo.time_limit || '[未設定]'}に戻しました`)
+            time_limit = this.props.todo.time_limit
+        }
+        
         this.props.update({ ...this.props.todo, time_limit })
     }
     remove = () => {
@@ -66,7 +77,7 @@ export default class Todo extends React.Component<Props, State> {
                     <EditableText type="date"
                         value={todo.time_limit || ''}
                         defaultValue={'2017-01-01'}
-                        update={this.updateTime_limit}
+                        update={this.updateTimeLimit}
                         >
                         🗓{todo.time_limit}
                     </EditableText>
