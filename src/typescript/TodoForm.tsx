@@ -24,14 +24,18 @@ export default class TodoForm extends React.Component<Props, State> {
     titleKeyDownHandler: React.EventHandler<React.KeyboardEvent<HTMLInputElement>> = e => {
         if (e.keyCode !== 13 || this.state.title === '') return
 
-        this.props.addTodo({ "title": this.state.title })
+        this.props.addTodo({
+            title: this.state.title,
+            time_limit: this.state.limit_time
+        })
+
         this.setState({
             title: '',
             limit_time: null
         })
     }
     updateLimit_time = (limit_time: string | null) => {
-        if (limit_time != null && !checkDate(limit_time)) {
+        if (limit_time && !checkDate(limit_time)) {
             alert(`${limit_time}は無効な日付です\n${this.state.limit_time || '[未設定]'}に戻しました`)
             limit_time = null
         }

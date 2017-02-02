@@ -159,14 +159,17 @@ var TodoForm = (function (_super) {
         _this.titleKeyDownHandler = function (e) {
             if (e.keyCode !== 13 || _this.state.title === '')
                 return;
-            _this.props.addTodo({ "title": _this.state.title });
+            _this.props.addTodo({
+                title: _this.state.title,
+                time_limit: _this.state.limit_time
+            });
             _this.setState({
                 title: '',
                 limit_time: null
             });
         };
         _this.updateLimit_time = function (limit_time) {
-            if (limit_time != null && !checkDate(limit_time)) {
+            if (limit_time && !checkDate(limit_time)) {
                 alert(limit_time + "\u306F\u7121\u52B9\u306A\u65E5\u4ED8\u3067\u3059\n" + (_this.state.limit_time || '[未設定]') + "\u306B\u623B\u3057\u307E\u3057\u305F");
                 limit_time = null;
             }
