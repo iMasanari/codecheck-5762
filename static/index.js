@@ -360,14 +360,16 @@ var TodoList = (function (_super) {
         };
         _this.calenderContent = function (year, month, date) {
             var time = getTimeFormat(year, month, date);
-            var Todos = _this.state.todoDictIndex
+            var todos = _this.state.todoDictIndex
                 .filter(function (id) { return time === _this.state.todoDict[id].time_limit; })
-                .map(function (id) {
-                return React.createElement(Todo, { key: id, todo: _this.state.todoDict[id], update: _this.updateTodo, remove: _this.removeTodo });
-            });
+                .map(function (id) { return _this.state.todoDict[id]; });
+            var len = todos.length;
+            var star = todos.filter(function (todo) { return todo.star; }).length;
+            var unstar = len - star;
             return React.createElement("div", { className: "calenderContent" },
-                React.createElement("div", { style: { textAlign: 'right' } }, date),
-                Todos);
+                React.createElement("div", { style: { textAlign: 'right', fontSize: '20px' } }, date),
+                React.createElement("div", { style: { textAlign: 'center' } }, star ? "\u2B50\uFE0F: " + star : undefined),
+                React.createElement("div", { style: { textAlign: 'center' } }, unstar ? "\u2606: " + unstar : undefined));
         };
         readTodos().then(function (todos) {
             if (!todos)

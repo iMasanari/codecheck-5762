@@ -79,18 +79,22 @@ export default class TodoList extends React.Component<Props, State> {
     }
     calenderContent = (year: number, month: number, date: number) => {
         const time = getTimeFormat(year, month, date)
-        const Todos = this.state.todoDictIndex
+        const todos = this.state.todoDictIndex
             .filter(id => time === this.state.todoDict[id].time_limit)
-            .map(id =>
-                <Todo key={id}
-                    todo={this.state.todoDict[id]}
-                    update={this.updateTodo}
-                    remove={this.removeTodo} />
-            )
+            .map(id => this.state.todoDict[id])
+
+        const len = todos.length
+        const star = todos.filter(todo => todo.star).length
+        const unstar = len - star
 
         return <div className="calenderContent">
-            <div style={{ textAlign: 'right' }}>{date}</div>
-            {Todos}
+            <div style={{ textAlign: 'right', fontSize: '20px' }}>{date}</div>
+            <div style={{ textAlign: 'center' }}>
+                {star ? `⭐️: ${star}` : undefined}
+            </div>
+            <div style={{ textAlign: 'center' }}>
+                {unstar ? `☆: ${unstar}` : undefined}
+            </div>
         </div>
     }
 

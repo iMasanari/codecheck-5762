@@ -154,6 +154,7 @@ li.TodoFilter-selected {
     border-left: 1px solid #ccc;
     vertical-align: top;
     height: 80px;
+    padding: 8px 4px;
 }
 .Calender-table td:first-child {
     border-left: none;
