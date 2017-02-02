@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "server": "java -jar server.jar",
-    "build": "rollup -c",
+    "build": "npm run build-src && npm run build-libs",
+    "build-src": "rollup -c",
+    "build-libs": "node build-libs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
