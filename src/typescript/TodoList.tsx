@@ -4,6 +4,8 @@ import * as ReactDOM from 'react-dom'
 import Todo from './Todo'
 import TodoForm from './TodoForm'
 import TodoFilter, { Filter } from './TodoFilter'
+import Calender from './Calender'
+import { getTimeFormat } from './checkDate'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<TodoList> {
@@ -35,7 +37,7 @@ export default class TodoList extends React.Component<Props, State> {
     addTodo = (todo: Partial<api.Todo>) => {
         api.addTodo(todo).then(todo => {
             if (!todo) return
-            
+
             const {todoDictIndex, todoDict} = this.state
 
             this.setState({
@@ -73,6 +75,23 @@ export default class TodoList extends React.Component<Props, State> {
 
         this.setState({ filter, todoDictIndex })
     }
+    calenderContent = (year: number, month: number, date: number) => {
+        const time = getTimeFormat(year, month, date)
+        const Todos = this.state.todoDictIndex
+            .filter(id => time === this.state.todoDict[id].time_limit)
+            .map(id =>
+                <Todo key={id}
+                    todo={this.state.todoDict[id]}
+                    update={this.updateTodo}
+                    remove={this.removeTodo} />
+            )
+
+        return <div className="calenderContent">
+            <div style={{ textAlign: 'right' }}>{date}</div>
+            {Todos}
+        </div>
+    }
+
     shouldComponentUpdate(nextProps: Props, nextState: State) {
         return this.props !== nextProps || this.state !== nextState
     }
@@ -88,6 +107,7 @@ export default class TodoList extends React.Component<Props, State> {
             <TodoForm addTodo={this.addTodo} />
             <TodoFilter filter={this.state.filter} setFilter={this.setFilter} />
             {Todos}
+            <Calender eachDateContent={this.calenderContent} />
         </div>
     }
 }

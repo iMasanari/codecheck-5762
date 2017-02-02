@@ -1,0 +1,13 @@
+.Calender {
+    max-width: 600px;
+}
+.Calender-table {
+    table-layout: fixed;
+    width: 100%;
+}
+.calenderContent > .Todo {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 10px;
+}

@@ -73,8 +73,11 @@ function checkDate(time_limit) {
         return false;
     }
     var time = new Date(+year, +month - 1, +date);
-    var checkTime_limit = time.getFullYear() + "-" + paddingZero(time.getMonth() + 1) + "-" + paddingZero(time.getDate());
+    var checkTime_limit = getTimeFormat(time.getFullYear(), time.getMonth() + 1, time.getDate());
     return time_limit === checkTime_limit;
+}
+function getTimeFormat(year, month, date) {
+    return year + "-" + paddingZero(month) + "-" + paddingZero(date);
 }
 
 var Todo = (function (_super) {
@@ -129,16 +132,15 @@ var Todo = (function (_super) {
     };
     Todo.prototype.render = function () {
         var todo = this.props.todo;
-        return React.createElement("div", null,
-            React.createElement("div", null,
-                React.createElement("input", { type: "checkbox", checked: todo.done, onChange: this.toggleDone }),
-                React.createElement("span", { style: todo.done ? this.completedStyle : undefined },
-                    React.createElement(EditableText, { value: todo.title, update: this.updateTitle }),
-                    React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTimeLimit },
-                        "\uD83D\uDDD3",
-                        todo.time_limit)),
-                React.createElement("span", { onClick: this.toggleStar }, todo.star ? '⭐️' : '☆'),
-                React.createElement("button", { onClick: this.remove }, "remove")));
+        return React.createElement("div", { className: "Todo" },
+            React.createElement("input", { type: "checkbox", checked: todo.done, onChange: this.toggleDone }),
+            React.createElement("span", { style: todo.done ? this.completedStyle : undefined },
+                React.createElement(EditableText, { value: todo.title, update: this.updateTitle }),
+                React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTimeLimit },
+                    "\uD83D\uDDD3",
+                    todo.time_limit)),
+            React.createElement("span", { onClick: this.toggleStar }, todo.star ? '⭐️' : '☆'),
+            React.createElement("button", { onClick: this.remove }, "remove"));
     };
     return Todo;
 }(React.Component));
@@ -208,6 +210,70 @@ var TodoFilter = function (props) {
         return React.createElement("li", { style: filter === props.filter ? selectedStyle : liStyle, onClick: function (_) { props.setFilter(filter); } }, text);
     }));
 };
+
+var Calender = (function (_super) {
+    __extends(Calender, _super);
+    function Calender() {
+        var _this = _super.call(this) || this;
+        _this.setNextMonth = function () {
+            var _a = _this.state.date, year = _a[0], month = _a[1];
+            if (11 < month) {
+                _this.setState({ date: [year + 1, month - 11] });
+            }
+            else {
+                _this.setState({ date: [year, month + 1] });
+            }
+        };
+        _this.setPrevMonth = function () {
+            var _a = _this.state.date, year = _a[0], month = _a[1];
+            if (month < 2) {
+                _this.setState({ date: [year - 1, month + 11] });
+            }
+            else {
+                _this.setState({ date: [year, month - 1] });
+            }
+        };
+        var today = new Date();
+        _this.state = ({
+            today: today,
+            date: [today.getFullYear(), today.getMonth() + 1]
+        });
+        return _this;
+    }
+    Calender.prototype.eachDateContent = function (year, month, date) {
+        return date;
+    };
+    // shouldComponentUpdate(nextProps: Props, nextState: State) {
+    //     return this.props !== nextProps || this.state !== nextState
+    // }
+    Calender.prototype.render = function () {
+        var _a = this.state.date, year = _a[0], month = _a[1];
+        var firstDay = new Date(year, month - 1, 1).getDay();
+        var lastDate = new Date(year, month, 0).getDate();
+        var eachDateContent = this.props.eachDateContent || this.eachDateContent;
+        var tr = [];
+        for (var i = 1 - firstDay; i <= lastDate; i += 7) {
+            var td = new Array(7);
+            for (var j = 0; j < 7; ++j) {
+                var date = i + j;
+                var content = (date <= 0 || lastDate < date) ? undefined : eachDateContent(year, month, date);
+                td.push(React.createElement("td", { key: "td-" + date }, content));
+            }
+            tr.push(React.createElement("tr", { key: "tr-" + i }, td));
+        }
+        return React.createElement("div", { className: "Calender" },
+            React.createElement("div", { style: { textAlign: 'center' } },
+                React.createElement("button", { onClick: this.setPrevMonth }, "-"),
+                React.createElement("span", null,
+                    year,
+                    "\u5E74",
+                    month,
+                    "\u6708"),
+                React.createElement("button", { onClick: this.setNextMonth }, "+")),
+            React.createElement("table", { className: "Calender-table" }, tr));
+    };
+    return Calender;
+}(React.Component));
 
 // import 'whatwg-fetch'
 var url = 'http://localhost:8080/api/1/todo/';
@@ -294,6 +360,17 @@ var TodoList = (function (_super) {
             });
             _this.setState({ filter: filter, todoDictIndex: todoDictIndex });
         };
+        _this.calenderContent = function (year, month, date) {
+            var time = getTimeFormat(year, month, date);
+            var Todos = _this.state.todoDictIndex
+                .filter(function (id) { return time === _this.state.todoDict[id].time_limit; })
+                .map(function (id) {
+                return React.createElement(Todo, { key: id, todo: _this.state.todoDict[id], update: _this.updateTodo, remove: _this.removeTodo });
+            });
+            return React.createElement("div", { className: "calenderContent" },
+                React.createElement("div", { style: { textAlign: 'right' } }, date),
+                Todos);
+        };
         readTodos().then(function (todos) {
             _this.setState({
                 todoDictIndex: todos.map(function (todo) { return todo.id; }),
@@ -319,7 +396,8 @@ var TodoList = (function (_super) {
         return React.createElement("div", null,
             React.createElement(TodoForm, { addTodo: this.addTodo }),
             React.createElement(TodoFilter, { filter: this.state.filter, setFilter: this.setFilter }),
-            Todos);
+            Todos,
+            React.createElement(Calender, { eachDateContent: this.calenderContent }));
     };
     return TodoList;
 }(React.Component));

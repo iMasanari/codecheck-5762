@@ -2,7 +2,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 
 import EditableText from './EditableText'
-import checkDate from './checkDate'
+import { checkDate } from './checkDate'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<TodoForm> {
@@ -31,7 +31,7 @@ export default class TodoForm extends React.Component<Props, State> {
         })
     }
     updateLimit_time = (limit_time: string | null) => {
-        if (limit_time != null && !checkDate(limit_time)){
+        if (limit_time != null && !checkDate(limit_time)) {
             alert(`${limit_time}は無効な日付です\n${this.state.limit_time || '[未設定]'}に戻しました`)
             limit_time = null
         }

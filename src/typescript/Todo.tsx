@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom'
 
 import TodoList from './TodoList'
 import EditableText from './EditableText'
-import checkDate from './checkDate'
+import { checkDate } from './checkDate'
 import * as api from './api'
 
 interface Props extends React.ClassAttributes<Todo> {
@@ -44,12 +44,12 @@ export default class Todo extends React.Component<Props, State> {
             this.props.update({ ...this.props.todo, time_limit: null })
             return
         }
-        
-        if (!checkDate(time_limit)){
+
+        if (!checkDate(time_limit)) {
             alert(`${time_limit}は無効な日付です\n${this.props.todo.time_limit || '[未設定]'}に戻しました`)
             time_limit = this.props.todo.time_limit
         }
-        
+
         this.props.update({ ...this.props.todo, time_limit })
     }
     remove = () => {
@@ -66,8 +66,7 @@ export default class Todo extends React.Component<Props, State> {
     render() {
         const {todo} = this.props
 
-        return <div>
-            <div>
+        return <div className="Todo">
                 <input type="checkbox"
                     checked={todo.done}
                     onChange={this.toggleDone}
@@ -86,7 +85,6 @@ export default class Todo extends React.Component<Props, State> {
                     {todo.star ? '⭐️' : '☆'}
                 </span>
                 <button onClick={this.remove}>remove</button>
-            </div>
         </div>
     }
 }
