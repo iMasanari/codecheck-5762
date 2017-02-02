@@ -23,10 +23,6 @@ export default class Todo extends React.Component<Props, State> {
         title: HTMLInputElement
     }
 
-    completedStyle = {
-        textDecoration: 'line-through',
-        color: 'gray'
-    }
     toggleDone = () => {
         const {todo} = this.props
         this.props.update({ ...todo, done: !todo.done })
@@ -67,12 +63,14 @@ export default class Todo extends React.Component<Props, State> {
         const {todo} = this.props
 
         return <div className="Todo">
+            <div className="Todo-checkbox">
                 <input type="checkbox"
                     checked={todo.done}
                     onChange={this.toggleDone}
                     />
-                <span style={todo.done ? this.completedStyle : undefined}>
-                    <EditableText value={todo.title} update={this.updateTitle} />
+            </div>
+            <div className={'Todo-contents' + (todo.done ? ' Todo-done' : '')}>
+                <div className="Todo-header">
                     <EditableText type="date"
                         value={todo.time_limit || ''}
                         defaultValue={'2017-01-01'}
@@ -80,11 +78,15 @@ export default class Todo extends React.Component<Props, State> {
                         >
                         🗓{todo.time_limit}
                     </EditableText>
-                </span>
-                <span onClick={this.toggleStar}>
-                    {todo.star ? '⭐️' : '☆'}
-                </span>
-                <button onClick={this.remove}>remove</button>
+                    <span className="Todo-remove" onClick={this.remove}>❌</span>
+                </div>
+                <div className="Todo-title">
+                    <span className="Todo-star" onClick={this.toggleStar}>
+                        {todo.star ? '⭐️' : '☆'}
+                    </span>
+                    <EditableText value={todo.title} update={this.updateTitle} />
+                </div>
+            </div>
         </div>
     }
 }

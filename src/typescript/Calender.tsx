@@ -68,7 +68,7 @@ export default class Calender extends React.Component<Props, State> {
         }
 
         return <div className="Calender">
-            <div style={{ textAlign: 'center' }}>
+            <div className="Calender-header" style={{ textAlign: 'center' }}>
                 <button onClick={this.setPrevMonth}>-</button>
                 <span>{year}年{month}月</span>
                 <button onClick={this.setNextMonth}>+</button>

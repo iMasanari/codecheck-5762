@@ -49,19 +49,21 @@ export default class EditableText extends React.Component<Props, State> {
         return this.props !== nextProps || this.state !== nextState
     }
     render() {
-        return <label>
+        return <label className="EditableText">
             {this.state.editValue == null ?
                 <span onDoubleClick={this.editStart}>
-                    {this.props.children != null ? this.props.children : this.props.value}
+                    {this.props.children || this.props.value}
                 </span>
                 :
-                <input ref="input"
-                    type={this.props.type}
-                    value={this.state.editValue}
-                    onChange={this.onChange}
-                    onBlur={this.editEnd}
-                    onKeyDown={this.onKeyDown}
-                    />
+                <span className="EditableText-popup">
+                    <input className="EditableText-input" ref="input"
+                        type={this.props.type}
+                        value={this.state.editValue}
+                        onChange={this.onChange}
+                        onBlur={this.editEnd}
+                        onKeyDown={this.onKeyDown}
+                        />
+                </span>
             }
         </label>
     }

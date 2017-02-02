@@ -1,9 +1,162 @@
+.title {
+    margin: 0 auto;
+    max-width: 1000px;
+}
+
+.App {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    margin: 0 auto;
+    max-width: 1000px;
+    -webkit-flex-direction: row-reverse; /* Safari */
+    flex-direction:         row-reverse;
+}
+.App > div {
+    width: 48%;
+}
+
+/* TodoList */
+
+.TodoList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.TodoList > li {
+    padding: 8px 0;
+    margin: 8px 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+
+/* Todo */
+
+.Todo {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center; /* Safari */
+    align-items: center;
+}
+.Todo-checkbox,
+.Todo-remove {
+    width: 30px;
+    cursor: pointer;
+    text-align: center;
+}
+.Todo-contents {
+    width: calc(100% - 30px);
+}
+.Todo-done {
+    color: #ccc;
+}
+.Todo-done > .Todo-Title > .EditableText {
+    text-decoration: line-through;
+}
+.Todo-header {
+    font-size: .8em;
+
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+}
+.Todo-star {
+    display: inline-block;
+    width: 1.2em;
+    text-align: center;
+    cursor: pointer;
+}
+.Todo-Title > .EditableText {
+    width: calc(100% - 1.2em);
+}
+
+/* TodoFilter */
+
+.TodoFilter {
+    list-style: none;
+    width: 240px;
+    padding: 0;
+    margin: 4px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+}
+.TodoFilter > li {
+    display: inline-block;
+    width: 80px;
+    text-align: center;
+    padding: 4px 0;
+    color: #aaa;
+}
+li.TodoFilter-selected {
+    background: #eee;
+    color: #000;
+}
+
+/* TodoForm */
+
+.TodoForm {
+    padding: 16px;
+    margin: 32px 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+.TodoForm-input {
+    font-size: 1em;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #aaa;
+    font: inherit;
+    background: transparent;
+    -webkit-appearance: none;
+}
+
+/* EditableText */
+
+.EditableText {
+    display: inline-block;
+    line-height: 1.5;
+}
+.EditableText-input {
+    display: inline-block;
+    font-size: 1em;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    font: inherit;
+    -webkit-appearance: none;
+}
+
+/* Calender */
 .Calender {
-    max-width: 600px;
+    margin: 32px 4px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+.Calender-header {
+    padding: 8px;
 }
 .Calender-table {
     table-layout: fixed;
     width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.Calender-table td {
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    vertical-align: top;
+    height: 80px;
+}
+.Calender-table td:first-child {
+    border-left: none;
 }
 .calenderContent > .Todo {
     overflow: hidden;

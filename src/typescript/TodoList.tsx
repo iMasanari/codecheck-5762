@@ -27,6 +27,8 @@ export default class TodoList extends React.Component<Props, State> {
         super()
 
         api.readTodos().then(todos => {
+            if (!todos) return
+
             this.setState({
                 todoDictIndex: todos.map(todo => todo.id),
                 todoDict: todos.reduce((hash, todo) => (hash[todo.id] = todo, hash), {} as State['todoDict']),
@@ -97,17 +99,27 @@ export default class TodoList extends React.Component<Props, State> {
     }
     render() {
         const Todos = this.state.todoDictIndex.map(id =>
-            <Todo key={id}
-                todo={this.state.todoDict[id]}
-                update={this.updateTodo}
-                remove={this.removeTodo} />
+            <li>
+                <Todo key={id}
+                    todo={this.state.todoDict[id]}
+                    update={this.updateTodo}
+                    remove={this.removeTodo} />
+            </li>
         )
 
         return <div>
-            <TodoForm addTodo={this.addTodo} />
-            <TodoFilter filter={this.state.filter} setFilter={this.setFilter} />
-            {Todos}
-            <Calender eachDateContent={this.calenderContent} />
+            <h1 className="title">Todo Calender</h1>
+            <hr />
+            <div className="App">
+                <div>
+                    <Calender eachDateContent={this.calenderContent} />
+                </div>
+                <div>
+                    <TodoForm addTodo={this.addTodo} />
+                    <TodoFilter filter={this.state.filter} setFilter={this.setFilter} />
+                    <ul className="TodoList">{Todos}</ul>
+                </div>
+            </div>
         </div>
     }
 }

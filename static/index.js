@@ -58,10 +58,11 @@ var EditableText = (function (_super) {
         return this.props !== nextProps || this.state !== nextState;
     };
     EditableText.prototype.render = function () {
-        return React.createElement("label", null, this.state.editValue == null ?
-            React.createElement("span", { onDoubleClick: this.editStart }, this.props.children != null ? this.props.children : this.props.value)
+        return React.createElement("label", { className: "EditableText" }, this.state.editValue == null ?
+            React.createElement("span", { onDoubleClick: this.editStart }, this.props.children || this.props.value)
             :
-                React.createElement("input", { ref: "input", type: this.props.type, value: this.state.editValue, onChange: this.onChange, onBlur: this.editEnd, onKeyDown: this.onKeyDown }));
+                React.createElement("span", { className: "EditableText-popup" },
+                    React.createElement("input", { className: "EditableText-input", ref: "input", type: this.props.type, value: this.state.editValue, onChange: this.onChange, onBlur: this.editEnd, onKeyDown: this.onKeyDown })));
     };
     return EditableText;
 }(React.Component));
@@ -86,10 +87,6 @@ var Todo = (function (_super) {
         var _this = _super.apply(this, arguments) || this;
         _this.state = {
             editTitle: null
-        };
-        _this.completedStyle = {
-            textDecoration: 'line-through',
-            color: 'gray'
         };
         _this.toggleDone = function () {
             var todo = _this.props.todo;
@@ -133,14 +130,17 @@ var Todo = (function (_super) {
     Todo.prototype.render = function () {
         var todo = this.props.todo;
         return React.createElement("div", { className: "Todo" },
-            React.createElement("input", { type: "checkbox", checked: todo.done, onChange: this.toggleDone }),
-            React.createElement("span", { style: todo.done ? this.completedStyle : undefined },
-                React.createElement(EditableText, { value: todo.title, update: this.updateTitle }),
-                React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTimeLimit },
-                    "\uD83D\uDDD3",
-                    todo.time_limit)),
-            React.createElement("span", { onClick: this.toggleStar }, todo.star ? '⭐️' : '☆'),
-            React.createElement("button", { onClick: this.remove }, "remove"));
+            React.createElement("div", { className: "Todo-checkbox" },
+                React.createElement("input", { type: "checkbox", checked: todo.done, onChange: this.toggleDone })),
+            React.createElement("div", { className: 'Todo-contents' + (todo.done ? ' Todo-done' : '') },
+                React.createElement("div", { className: "Todo-header" },
+                    React.createElement(EditableText, { type: "date", value: todo.time_limit || '', defaultValue: '2017-01-01', update: this.updateTimeLimit },
+                        "\uD83D\uDDD3",
+                        todo.time_limit),
+                    React.createElement("span", { className: "Todo-remove", onClick: this.remove }, "\u274C")),
+                React.createElement("div", { className: "Todo-title" },
+                    React.createElement("span", { className: "Todo-star", onClick: this.toggleStar }, todo.star ? '⭐️' : '☆'),
+                    React.createElement(EditableText, { value: todo.title, update: this.updateTitle }))));
     };
     return Todo;
 }(React.Component));
@@ -178,11 +178,12 @@ var TodoForm = (function (_super) {
         return this.props !== nextProps || this.state !== nextState;
     };
     TodoForm.prototype.render = function () {
-        return React.createElement("div", null,
-            React.createElement("input", { type: "text", placeholder: "Add Todo...", value: this.state.title, onChange: this.titleChangeHandler, onKeyDown: this.titleKeyDownHandler }),
+        return React.createElement("div", { className: "TodoForm" },
             React.createElement(EditableText, { value: this.state.limit_time || '', update: this.updateLimit_time, defaultValue: '2017-01-01' },
                 "\uD83D\uDDD3",
-                this.state.limit_time));
+                this.state.limit_time || '----/--/--'),
+            React.createElement("br", null),
+            React.createElement("input", { className: "TodoForm-input", type: "text", placeholder: "Write task and press Enter!", value: this.state.title, onChange: this.titleChangeHandler, onKeyDown: this.titleKeyDownHandler }));
     };
     return TodoForm;
 }(React.Component));
@@ -198,16 +199,10 @@ var list = [
     ['Active', Filter.active],
     ['Completed', Filter.completed]
 ];
-var liStyle = {
-    display: 'inline-block',
-    width: '80px',
-    textAlign: 'center'
-};
-var selectedStyle = __assign({}, liStyle, { background: '#eee' });
 var TodoFilter = function (props) {
-    return React.createElement("ul", null, list.map(function (_a) {
+    return React.createElement("ul", { className: "TodoFilter" }, list.map(function (_a) {
         var text = _a[0], filter = _a[1];
-        return React.createElement("li", { style: filter === props.filter ? selectedStyle : liStyle, onClick: function (_) { props.setFilter(filter); } }, text);
+        return React.createElement("li", { className: filter === props.filter ? 'TodoFilter-selected' : undefined, onClick: function (_) { props.setFilter(filter); } }, text);
     }));
 };
 
@@ -262,7 +257,7 @@ var Calender = (function (_super) {
             tr.push(React.createElement("tr", { key: "tr-" + i }, td));
         }
         return React.createElement("div", { className: "Calender" },
-            React.createElement("div", { style: { textAlign: 'center' } },
+            React.createElement("div", { className: "Calender-header", style: { textAlign: 'center' } },
                 React.createElement("button", { onClick: this.setPrevMonth }, "-"),
                 React.createElement("span", null,
                     year,
@@ -372,6 +367,8 @@ var TodoList = (function (_super) {
                 Todos);
         };
         readTodos().then(function (todos) {
+            if (!todos)
+                return;
             _this.setState({
                 todoDictIndex: todos.map(function (todo) { return todo.id; }),
                 todoDict: todos.reduce(function (hash, todo) { return (hash[todo.id] = todo, hash); }, {}),
@@ -391,13 +388,19 @@ var TodoList = (function (_super) {
     TodoList.prototype.render = function () {
         var _this = this;
         var Todos = this.state.todoDictIndex.map(function (id) {
-            return React.createElement(Todo, { key: id, todo: _this.state.todoDict[id], update: _this.updateTodo, remove: _this.removeTodo });
+            return React.createElement("li", null,
+                React.createElement(Todo, { key: id, todo: _this.state.todoDict[id], update: _this.updateTodo, remove: _this.removeTodo }));
         });
         return React.createElement("div", null,
-            React.createElement(TodoForm, { addTodo: this.addTodo }),
-            React.createElement(TodoFilter, { filter: this.state.filter, setFilter: this.setFilter }),
-            Todos,
-            React.createElement(Calender, { eachDateContent: this.calenderContent }));
+            React.createElement("h1", { className: "title" }, "Todo Calender"),
+            React.createElement("hr", null),
+            React.createElement("div", { className: "App" },
+                React.createElement("div", null,
+                    React.createElement(Calender, { eachDateContent: this.calenderContent })),
+                React.createElement("div", null,
+                    React.createElement(TodoForm, { addTodo: this.addTodo }),
+                    React.createElement(TodoFilter, { filter: this.state.filter, setFilter: this.setFilter }),
+                    React.createElement("ul", { className: "TodoList" }, Todos))));
     };
     return TodoList;
 }(React.Component));

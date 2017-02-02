@@ -43,19 +43,20 @@ export default class TodoForm extends React.Component<Props, State> {
         return this.props !== nextProps || this.state !== nextState
     }
     render() {
-        return <div>
-            <input type="text" placeholder="Add Todo..."
-                value={this.state.title}
-                onChange={this.titleChangeHandler}
-                onKeyDown={this.titleKeyDownHandler}
-                />
+        return <div className="TodoForm">
             <EditableText
                 value={this.state.limit_time || ''}
                 update={this.updateLimit_time}
                 defaultValue={'2017-01-01'}
                 >
-                🗓{this.state.limit_time}
+                🗓{this.state.limit_time || '----/--/--'}
             </EditableText>
+            <br />
+            <input className="TodoForm-input" type="text" placeholder="Write task and press Enter!"
+                value={this.state.title}
+                onChange={this.titleChangeHandler}
+                onKeyDown={this.titleKeyDownHandler}
+                />
         </div>
     }
 }

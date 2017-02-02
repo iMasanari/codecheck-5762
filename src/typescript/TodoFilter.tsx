@@ -12,15 +12,6 @@ const list: [string, Filter][] = [
     ['Active', Filter.active],
     ['Completed', Filter.completed]
 ]
-const liStyle: React.CSSProperties = {
-    display: 'inline-block',
-    width: '80px',
-    textAlign: 'center'
-}
-const selectedStyle: React.CSSProperties = {
-    ...liStyle,
-    background: '#eee'
-}
 
 interface Props extends React.ClassAttributes<null> {
     filter: Filter
@@ -28,9 +19,9 @@ interface Props extends React.ClassAttributes<null> {
 }
 
 export default (props: Props) =>
-    <ul>
+    <ul className="TodoFilter">
         {list.map(([text, filter]) =>
-            <li style={filter === props.filter ? selectedStyle : liStyle}
+            <li className={filter === props.filter ? 'TodoFilter-selected' : undefined}
                 onClick={_ => { props.setFilter(filter) } }
                 >
                 {text}
