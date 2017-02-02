@@ -5,22 +5,24 @@ import Todo from './Todo'
 import TodoForm from './TodoForm'
 import TodoFilter, { Filter } from './TodoFilter'
 import Calender from './Calender'
-import { getTimeFormat } from './checkDate'
+import CalenderCell from './CalenderCell'
 import * as api from './api'
 
-interface Props extends React.ClassAttributes<TodoList> {
+export interface Props extends React.ClassAttributes<TodoList> {
 }
-interface State {
+export interface State {
     todoDict: { [key: number]: api.Todo }
     todoDictIndex: number[]
     filter: Filter
+    hoverTime: string | null
 }
 
 export default class TodoList extends React.Component<Props, State> {
     state: State = {
         todoDict: {},
         todoDictIndex: [],
-        filter: Filter.all
+        filter: Filter.all,
+        hoverTime: null
     }
 
     constructor() {
@@ -77,39 +79,30 @@ export default class TodoList extends React.Component<Props, State> {
 
         this.setState({ filter, todoDictIndex })
     }
-    calenderContent = (year: number, month: number, date: number) => {
-        const time = getTimeFormat(year, month, date)
-        const todos = this.state.todoDictIndex
-            .filter(id => time === this.state.todoDict[id].time_limit)
-            .map(id => this.state.todoDict[id])
-
-        const len = todos.length
-        const star = todos.filter(todo => todo.star).length
-        const unstar = len - star
-
-        return <div className="calenderContent">
-            <div style={{ textAlign: 'right', fontSize: '20px' }}>{date}</div>
-            <div style={{ textAlign: 'center' }}>
-                {star ? `⭐️${star === 1 ? '' : star}` : undefined}
-            </div>
-            <div style={{ textAlign: 'center' }}>
-                {unstar ? `☆${unstar === 1 ? '' : unstar}` : undefined}
-            </div>
-        </div>
+    hoverCallback = (hoverTime: string | null) => {
+        this.setState({ hoverTime })
     }
+    calenderContent = (year: number, month: number, date: number) =>
+        <CalenderCell
+            year={year} month={month} date={date}
+            todoDict={this.state.todoDict}
+            todoDictIndex={this.state.todoDictIndex}
+            hoverCallback={this.hoverCallback}
+            />
 
     shouldComponentUpdate(nextProps: Props, nextState: State) {
         return this.props !== nextProps || this.state !== nextState
     }
     render() {
-        const Todos = this.state.todoDictIndex.map(id =>
-            <li>
+        const Todos = this.state.todoDictIndex.map(id =>{
+            const todo = this.state.todoDict[id]
+            return <li className={this.state.hoverTime != null && todo.time_limit === this.state.hoverTime ? 'hoverTime' : undefined}>
                 <Todo key={id}
-                    todo={this.state.todoDict[id]}
+                    todo={todo}
                     update={this.updateTodo}
                     remove={this.removeTodo} />
             </li>
-        )
+        })
 
         return <div>
             <h1 className="title">Todo Calender</h1>
