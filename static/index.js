@@ -211,20 +211,26 @@ var TodoFilter = function (props) {
 
 // import 'whatwg-fetch'
 var url = 'http://localhost:8080/api/1/todo/';
-var fetchOption = {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' }
-};
 
 function readTodos() {
-    return fetch(url).then(function (response) { return response.json(); });
+    return fetch(url)
+        .then(toJson)
+        .catch(function (e) { return alert(e.message); });
 }
 function addTodo(todo) {
-    var option = __assign({}, fetchOption, { body: JSON.stringify(todo) });
-    return fetch(url, option).then(function (response) { return response.json(); });
+    var option = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(todo)
+    };
+    return fetch(url, option)
+        .then(toJson)
+        .catch(function (e) { return alert(e.message); });
 }
 function removeTodo(id) {
-    return fetch(url + id, { method: 'DELETE' });
+    return fetch(url + id, { method: 'DELETE' })
+        .then(toJson)
+        .catch(function (e) { return alert(e.message); });
 }
 function updateTodo(todo) {
     var option = {
@@ -232,7 +238,18 @@ function updateTodo(todo) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(todo)
     };
-    return fetch(url + todo.id, option).then(function (response) { return response.json(); });
+    return fetch(url + todo.id, option)
+        .then(toJson)
+        .catch(function (e) { return alert(e.message); });
+}
+function toJson(response) {
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    if (response.headers.get('content-type') === 'application/json;charset=UTF-8') {
+        return response.json();
+    }
+    return response.text();
 }
 
 var TodoList = (function (_super) {
@@ -246,6 +263,8 @@ var TodoList = (function (_super) {
         };
         _this.addTodo = function (todo) {
             addTodo(todo).then(function (todo) {
+                if (!todo)
+                    return;
                 var _a = _this.state, todoDictIndex = _a.todoDictIndex, todoDict = _a.todoDict;
                 _this.setState({
                     todoDictIndex: _this.checkFilter(todo) ? todoDictIndex.concat([todo.id]) : todoDictIndex,

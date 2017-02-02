@@ -34,6 +34,8 @@ export default class TodoList extends React.Component<Props, State> {
 
     addTodo = (todo: Partial<api.Todo>) => {
         api.addTodo(todo).then(todo => {
+            if (!todo) return
+            
             const {todoDictIndex, todoDict} = this.state
 
             this.setState({
