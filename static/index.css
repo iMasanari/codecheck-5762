@@ -165,3 +165,14 @@ li.TodoFilter-selected {
     text-overflow: ellipsis;
     font-size: 10px;
 }
+
+@media screen and (max-width:600px) { 
+    .App {
+        display: block;
+    }
+    .App > div {
+        width: auto;
+        margin-right: auto;
+        margin-left: auto;
+    }
+}

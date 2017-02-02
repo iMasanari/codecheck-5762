@@ -90,10 +90,10 @@ export default class TodoList extends React.Component<Props, State> {
         return <div className="calenderContent">
             <div style={{ textAlign: 'right', fontSize: '20px' }}>{date}</div>
             <div style={{ textAlign: 'center' }}>
-                {star ? `⭐️: ${star}` : undefined}
+                {star ? `⭐️${star === 1 ? '' : star}` : undefined}
             </div>
             <div style={{ textAlign: 'center' }}>
-                {unstar ? `☆: ${unstar}` : undefined}
+                {unstar ? `☆${unstar === 1 ? '' : unstar}` : undefined}
             </div>
         </div>
     }

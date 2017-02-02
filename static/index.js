@@ -368,8 +368,8 @@ var TodoList = (function (_super) {
             var unstar = len - star;
             return React.createElement("div", { className: "calenderContent" },
                 React.createElement("div", { style: { textAlign: 'right', fontSize: '20px' } }, date),
-                React.createElement("div", { style: { textAlign: 'center' } }, star ? "\u2B50\uFE0F: " + star : undefined),
-                React.createElement("div", { style: { textAlign: 'center' } }, unstar ? "\u2606: " + unstar : undefined));
+                React.createElement("div", { style: { textAlign: 'center' } }, star ? "\u2B50\uFE0F" + (star === 1 ? '' : star) : undefined),
+                React.createElement("div", { style: { textAlign: 'center' } }, unstar ? "\u2606" + (unstar === 1 ? '' : unstar) : undefined));
         };
         readTodos().then(function (todos) {
             if (!todos)
